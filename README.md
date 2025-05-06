@@ -30,22 +30,22 @@ git clone https://github.com/michelwanderson/jenkins-tomcat-jolokia-k8s.git
 ### 2. Baixe o arquivo jenkins.war
 
 ```
-wget -O jenkins.war  https://get.jenkins.io/war/2.440/jenkins.war
+wget -O docker/jenkins.war  https://get.jenkins.io/war/2.440/jenkins.war
 ```
 
 ### 2. Construa a Imagem Docker
 ```
-docker build -t k8s-jenkins-tomcat-jolokia .
+ docker build -t k8s-jenkins-tomcat-jolokia docker/.
 ```
 
 ### 3. Crie o cluster com KIND
 ```
-kind create cluster --config config.yaml 
+kind create cluster --config config.yaml --name "cluster-jenkins-tomcat-jolokia"
 ```
 
 ### 4. Construir e carregar a imagem no KIND
 ```
-kind load docker-image --name cluster-jenkins-tom-jolokia
+kind load docker-image k8s-jenkins-tomcat-jolokia --name cluster-jenkins-tomcat-jolokia
 ```
 
 ### 5. Aplicar o deployment no Kubernetes
@@ -55,14 +55,14 @@ kubectl apply -f deploy.yaml
 
 ### 6.  Verificar o funcionamento
 ```
-kubectl get pods kubectl
+kubectl get pods
 ```
 
 
 ## 🌐 Acessos
 #### Uma das formas de acesso via navegador é realizando mapeamento de portas
 ```
-port-forward svc/jenkins-tomcat-jolokia-service 8080:8080
+kubectl port-forward svc/jenkins-tomcat-jolokia 8080:8080
 ```
 
 -   **Jenkins Web:**  [http://localhost:8080/jenkins](http://localhost:8080/jenkins)
@@ -84,21 +84,45 @@ curl http://localhost:8080/jolokia/read/java.lang:type=Memory
 Para garantir que o Jenkins está configurado de forma segura pelo administrador, uma senha foi escrita no arquivo de registro, para salva-la e inserir no primeiro acesso via  [http://localhost:8080/jenkins](http://localhost:8080/jenkins)
 
 ```
-kubectl exec -it  cat root/.jenkins/secrets/initialAdminPassword
+kubectl exec -it svc/jenkins-tomcat-jolokia -- cat /root/.jenkins/secrets/initialAdminPassword
 ```
 
 ----------
 
 ## 🌟 Features
+✅ Cluster Kubernetes local criado com Kind
 
--   _Automação CI/CD:_  Jenkins instalado e configurado.
--   _Monitoramento JMX:_  Jolokia configurado para exposição via HTTP.
--   _Deploy em Kubernetes:_  Aplicação escalável, melhorando a confiabilidade
+✅ Deploy de aplicação baseada em jenkins, tomcat e jolokia
+
+✅ Serviço exposto na porta 8080 com:
+
+    - Interface Jenkins: /jenkins
+
+    - Endpoint Jolokia: /jolokia
+
+✅ Deploy automatizado com arquivos manifestos (YAML)
+
+✅ Arquitetura modular (containers separados, roles definidas no config.yaml do Kind)
+
+
 
 ## 🔒 Considerações de Segurança
+❗ Sem persistência de dados: volumes persistentes (PV/PVC) não foram configurados; em caso de reinício, os dados do Jenkins serão perdidos.
 
+❗ Sem autenticação habilitada no Jenkins (Jenkins em modo sem autenticação).
+
+❗ Jolokia exposto publicamente, sem controle de acesso – o endpoint /jolokia está acessível diretamente na porta 8080.
 
 
 ----------
 
 ## 🗂️ Estrutura do projeto
+```
+jenkins-tomcat-jolokia-k8s/ 
+├── README.md
+├── config.yaml
+├── deploy.yaml
+└── docker
+    ├── Dockerfile
+    └── context.xml
+```
