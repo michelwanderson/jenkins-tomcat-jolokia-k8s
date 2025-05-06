@@ -96,9 +96,9 @@ kubectl exec -it svc/jenkins-tomcat-jolokia -- cat /root/.jenkins/secrets/initia
 
 ✅ Serviço exposto na porta 8080 com:
 
-    - Interface Jenkins: /jenkins
+- Interface Jenkins: /jenkins
 
-    - Endpoint Jolokia: /jolokia
+- Endpoint Jolokia: /jolokia
 
 ✅ Deploy automatizado com arquivos manifestos (YAML)
 
