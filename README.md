@@ -45,7 +45,7 @@ kind create cluster --config config.yaml --name "cluster-jenkins-tomcat-jolokia"
 
 ### 4. Construir e carregar a imagem no KIND
 ```
-kind load docker-image k8s-jenkins-tomcat-jolokia --name cluster-jenkins-tomcat-jolokia
+kind load docker-image k8s-jenkins-tomcat-jolokia --name "cluster-jenkins-tomcat-jolokia"
 ```
 
 ### 5. Aplicar o deployment no Kubernetes
